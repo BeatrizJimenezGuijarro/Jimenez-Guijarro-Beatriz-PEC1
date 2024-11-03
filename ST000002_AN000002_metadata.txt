@@ -1,0 +1,143 @@
+metabolite_name	moverz_quant	ri	ri_type	pubchem_id	inchi_key	kegg_id	other_id	other_id_type
+1-monoolein	129	952993	Fiehn	5283468			213963	BinBase
+1-monostearin	399	959625	Fiehn	107036		D01947	202835	BinBase
+2-hydroxybutanoic acid	131	258175	Fiehn	11266		C05984	199800	BinBase
+2-hydroxyglutaric acid	129	506359	Fiehn	43		C02630	214409	BinBase
+2-ketoisocaproic acid	200	310629	Fiehn	70		C00233	213388	BinBase
+2-monopalmitin	218	889972	Fiehn	123409			233239	BinBase
+2-monostearin NIST	218	948845	Fiehn				227282	BinBase
+3-aminoisobutyric acid	102	309799	Fiehn	64956		C01205	213161	BinBase
+3-hydroxybutanoic acid	191	278929	Fiehn	11266		C05984	199774	BinBase
+3-hydroxypropionic acid	177	269975	Fiehn	68152		C01013	232649	BinBase
+3-phenyllactic acid	193	516416	Fiehn	3848		C05607	213134	BinBase
+5-aminovaleric acid	174	536304	Fiehn	138		C00431	238442	BinBase
+acetohydroxamic acid	190	222307	Fiehn	1990		C06808	206309	BinBase
+acetophenone NIST	105	238719	Fiehn	7410		C07113	211899	BinBase
+adipic acid	111	475399	Fiehn	196		C06104	218815	BinBase
+alanine	116	243537	Fiehn	602		C00041	199651	BinBase
+alpha ketoglutaric acid	198	507734	Fiehn	51		C00026	200425	BinBase
+aminomalonate	218	455886	Fiehn	100714		C00872	199624	BinBase
+arabinose	217	546892	Fiehn	7044039		C00216	202065	BinBase
+arabitol	103	566749	Fiehn	439255		C01904	200524	BinBase
+arachidic acid	117	856203	Fiehn	10467		C06425	201822	BinBase
+arachidonic acid	91	833292	Fiehn	444899		C00219	221144	BinBase
+arginine + ornithine	142	619420	Fiehn	6322		C00062	199796	BinBase
+asparagine	116	553791	Fiehn	439600		C00152	199805	BinBase
+aspartic acid	232	480543	Fiehn	424		C00049	199612	BinBase
+behenic acid	117	919675	Fiehn	8215		C08281	203290	BinBase
+benzoic acid	179	338043	Fiehn	243		C00180	211970	BinBase
+benzylalcohol	165	281322	Fiehn	244		C00556	200353	BinBase
+beta-alanine	248	431950	Fiehn	239		C00099	227997	BinBase
+beta-gentiobiose	204	967919	Fiehn	219994		C08240	214469	BinBase
+beta-sitosterol	129	1129771	Fiehn	22012		C01753	237277	BinBase
+caffeic acid	219	748306	Fiehn	1549111		C01481	202653	BinBase
+cerotic acid	117	1032431	Fiehn	10469			199267	BinBase
+cholesterol	129	1077630	Fiehn	5997		C00187	199589	BinBase
+citric acid	273	617288	Fiehn	311		C00158	199168	BinBase
+citrulline	256	622791	Fiehn	9750		C00327	202827	BinBase
+creatinine	115	502434	Fiehn	588		C00791	199603	BinBase
+cyano-L-alanine	141	404014	Fiehn	13538		C02512	200605	BinBase
+cysteine	220	501345	Fiehn	60960		C00097	200918	BinBase
+cystine	218	804143	Fiehn	595		C00491	223490	BinBase
+dihydroabietic acid	239	849610	Fiehn	227277			226283	BinBase
+elaidic acid	339	780799	Fiehn	637517		C01712	201152	BinBase
+erythritol	205	471274	Fiehn	222285		C00503	200514	BinBase
+ethanolamine	174	345242	Fiehn	700		C00189	218991	BinBase
+fructose	307	638631	Fiehn	439553		C00095	199188	BinBase
+fucose 1 + rhamnose 2	117	577861	Fiehn	444200		C01018	205102	BinBase
+fucose 2	117	584612	Fiehn	94270		C01019	205106	BinBase
+fumaric acid	245	390708	Fiehn	444972		C00122	218753	BinBase
+GABA	174	488961	Fiehn	119		C00334	205021	BinBase
+galactose	160	647787	Fiehn	59083882		C00124	202679	BinBase
+galacturonic acid	160	670193	Fiehn	441476		C00333	201840	BinBase
+gamma-tocopherol	223	1026222	Fiehn	92729		C02483	202089	BinBase
+gluconic acid	333	693140	Fiehn	10690		C00257	211990	BinBase
+glucose	160	649920	Fiehn	5793		C00031	199413	BinBase
+glucuronic acid	333	666743	Fiehn	441478		C00191	216853	BinBase
+glutamic acid	246	529370	Fiehn	33032		C00025	199604	BinBase
+glutamine	156	600452	Fiehn	738		C00064	199776	BinBase
+glutaric acid	158	422031	Fiehn	743		C00489	219178	BinBase
+glyceric acid	189	377001	Fiehn	439194		C00258	199174	BinBase
+glycerol	205	344223	Fiehn	11126194		C00116	199617	BinBase
+glycerol-3-galactoside NIST	204	803554	Fiehn	656504		C05401	225851	BinBase
+glycerol-alpha-phosphate	299	591357	Fiehn	754		C03189	199419	BinBase
+glycine	174	368041	Fiehn	750		C00037	199588	BinBase
+glycolic acid	177	227487	Fiehn	3698251		C00160	202167	BinBase
+glycyl proline	174	692401	Fiehn	3013625			238315	BinBase
+guanine	352	744497	Fiehn	764		C00242	213138	BinBase
+guanosine	324	955097	Fiehn	6802		C00387	213207	BinBase
+heptadecanoic acid	117	750645	Fiehn	10465			200398	BinBase
+homoserine	128	444264	Fiehn	12647		C00263	206163	BinBase
+hydrocinnamic acid	104	435417	Fiehn	107		C05629	202602	BinBase
+hydroxycarbamate NIST	278	325357	Fiehn	16639161			203241	BinBase
+hydroxylamine	146	255313	Fiehn	10931771		C00192	205859	BinBase
+icosenoic acid	129	848697	Fiehn	5282768			214000	BinBase
+indole-3-acetate	202	685195	Fiehn	802		C00954	223508	BinBase
+indole-3-lactate	202	764543	Fiehn	92904		C02043	223518	BinBase
+inosine	217	897806	Fiehn	6021		C00294	199606	BinBase
+inositol-4-monophosphate	318	845491	Fiehn	6349		C03546	200698	BinBase
+inositol myo-	305	729867	Fiehn	892		C00137	199164	BinBase
+isoleucine	158	358756	Fiehn	6306		C00407	199785	BinBase
+isolinoleic acid NIST	95	794629	Fiehn	3931			269289	BinBase
+isothreonic acid	292	489846	Fiehn	151152			200467	BinBase
+lactic acid	117	216442	Fiehn	107689		C00186	199591	BinBase
+lanosterol	109	1128745	Fiehn	856		C01724	214144	BinBase
+lauric acid	117	547810	Fiehn	3893		C02679	201826	BinBase
+leucine	158	345953	Fiehn	6106		C00123	199607	BinBase
+levanbiose	217	938676	Fiehn	439555		C01725	200516	BinBase
+levoglucosan	204	569799	Fiehn	79029			199201	BinBase
+lignoceric acid	117	977850	Fiehn	11197		C08320	199247	BinBase
+linoleic acid	337	777102	Fiehn	5280450		C01595	199240	BinBase
+lysine	156	663088	Fiehn	5962		C00047	199784	BinBase
+lyxitol	217	575571	Fiehn	94154		C00532	199230	BinBase
+malate	233	462908	Fiehn	222656		C00149	199166	BinBase
+maleimide	154	244928	Fiehn	10935		C07272	200907	BinBase
+methanolphosphate	241	290941	Fiehn	13130			199608	BinBase
+methionine	176	483425	Fiehn	6137		C00073	200533	BinBase
+methionine sulfoxide	128	637775	Fiehn	158980		C02989	218901	BinBase
+monomyristin NIST	343	838323	Fiehn				227295	BinBase
+monopalmitin-1-glyceride	371	901207	Fiehn	14900			202859	BinBase
+myristic acid	285	634543	Fiehn	11005		C06424	199929	BinBase
+naphtalene	128	315496	Fiehn	931		C00829	199632	BinBase
+N-methylalanine	130	286258	Fiehn	5288725		C02721	205663	BinBase
+nonadecanoic acid	117	822744	Fiehn	12591		C16535	241109	BinBase
+octadecanol	327	755073	Fiehn	8221		D01924	199219	BinBase
+oleic acid	339	778858	Fiehn	965		C01712	199610	BinBase
+ornithine	142	527822	Fiehn	6262		C00077	202829	BinBase
+orotic acid	254	584723	Fiehn	967		C00295	237885	BinBase
+oxoproline	156	486399	Fiehn	7405		C01879	199593	BinBase
+palatinose	217	976650	Fiehn	4177368		C01742	214142	BinBase
+palmitic acid	313	713542	Fiehn	985		C00249	199173	BinBase
+palmitoleic acid	129	706298	Fiehn	445638		C08362	203265	BinBase
+pelargonic acid	117	399163	Fiehn	8158		C01601	201810	BinBase
+pentadecanoic acid	132	674704	Fiehn	13849		C16537	203296	BinBase
+phenylalanine	218	537760	Fiehn	6140		C00079	199798	BinBase
+phosphoric acid	299	344674	Fiehn	1004		C00009	199165	BinBase
+proline	142	364232	Fiehn	145742		C00148	199611	BinBase
+putrescine	174	587728	Fiehn	9532		C00134	206261	BinBase
+pyruvate	174	211146	Fiehn	1060		C00022	202618	BinBase
+ribitol	217	572822	Fiehn			C00474	204361	BinBase
+ribose	307	553411	Fiehn	447347		C00121	204210	BinBase
+serine	204	394656	Fiehn	5951		C00065	199440	BinBase
+shikimic acid	204	610984	Fiehn	8742		C00493	199162	BinBase
+sorbitol	103	667682	Fiehn	453		C00794	204185	BinBase
+spermidine	144	792258	Fiehn	1102		C00315	200990	BinBase
+stearic acid	117	787358	Fiehn	5281		C01530	199195	BinBase
+succinic acid	147	370518	Fiehn	1110		C00042	199210	BinBase
+sucrose	271	915457	Fiehn	5988		C00089	202121	BinBase
+taurine	326	557250	Fiehn	1123		C00245	234595	BinBase
+threitol	217	467314	Fiehn	8998		C16884	202661	BinBase
+threonic acid	292	497167	Fiehn	5460407			199262	BinBase
+threonine	117	409403	Fiehn	6288		C00188	199626	BinBase
+tocopherol	237	1067178	Fiehn	14985		C02477	199211	BinBase
+trehalose	191	947837	Fiehn	7427		C01083	199289	BinBase
+tryptophan	202	779834	Fiehn	6305		C00078	199775	BinBase
+tyramine	174	664065	Fiehn	5610		C00483	211928	BinBase
+tyrosine	218	671085	Fiehn	6057		C00082	199781	BinBase
+uracil	99	385903	Fiehn	1174		C00106	199600	BinBase
+urea	171	328046	Fiehn	1176		C00086	199594	BinBase
+uric acid	441	731185	Fiehn	1175		C00366	221495	BinBase
+uridine	258	856953	Fiehn	6029		C00299	213127	BinBase
+valine	144	313224	Fiehn	6287		C00183	199605	BinBase
+xanthine	353	702391	Fiehn	1188		C00385	203224	BinBase
+xylose	103	542808	Fiehn	135191		C00181	200500	BinBase
