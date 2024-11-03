@@ -1,0 +1,350 @@
+---
+title: "Análisis de Datos Ómicos - PEC 1"
+author: "Beatriz Jiménez Guijarro"
+date: "`r format(Sys.Date(),'%e de %B, %Y')`"
+output:
+  pdf_document:
+    toc: true
+    toc_depth: 3
+    latex_engine: xelatex
+  html_document:
+    toc: true
+    toc_depth: 3
+    toc_float: true
+bibliography: referencias_pec1.bib
+nocite: |
+  @*
+---
+
+```{r setup, include=FALSE}
+library(knitr)
+# knitr options
+knitr::opts_chunk$set(echo = FALSE, results = 'show', message = FALSE, warning = FALSE)
+```
+
+# 1. *Abstract*
+
+Este estudio analiza datos de expresión metabolómica en muestras intestinales pre y post trasplante, con el objetivo de identificar patrones de variabilidad entre las muestras. A partir de datos de expresión metabolómica provenientes de un repositorio público, se han aplicado herramientas bioinformáticas en R para estructurar y analizar los datos. La integración de los datos en un objeto `SummarizedExperiment` ha permitido una manipulación estructurada y el análisis exploratorio de la expresión de los metabolitos.
+
+Los resultados del análisis multivariante, incluyendo análisis de componentes principales (PCA) y agrupación jerárquica, sugieren que existen diferencias sutiles entre las muestras, aunque no se observa una clara separación biológica entre los grupos pre y post trasplante en la mayoría de los componentes principales (PC), lo cual indica que los perfiles metabólicos entre ambos grupos son relativamente similares. Sin embargo, la agrupación jerárquica sugiere que algunos metabolitos pueden contribuir de forma específica a la diferenciación entre grupos. Las implicaciones de estos hallazgos en la identificación de posibles biomarcadores se exploran en el estudio.
+
+# 2. Objetivos del estudio
+
+El objetivo principal de este estudio es investigar los cambios en el perfil metabolómico intestinal en individuos sometidos a un trasplante intestinal, comparando muestras pre y post trasplante. Se busca identificar patrones de expresión y variabilidad entre los metabolitos que puedan proporcionar información sobre los cambios metabólicos asociados al trasplante, y así mejorar la comprensión de las diferencias metabólicas y su relación con la adaptación del injerto.
+
+Además, se pretende evaluar la utilidad de herramientas bioinformáticas para el análisis metabolómico en este contexto, especialmente mediante el uso de análisis exploratorio de datos y técnicas multivariantes como el análisis de componentes principales (PCA) y la agrupación jerárquica.
+
+# 3. Materiales y Métodos
+
+En este apartado se describe el conjunto de datos utilizado para el análisis, las herramientas bioinformáticas empleadas y el procedimiento general seguido para procesar y analizar los datos de expresión metabolómica asociados a los intestinos humanos. Este análisis tiene como objetivo identificar patrones de agrupamiento y variabilidad que puedan aportar información sobre las diferencias metabólicas entre muestras de individuos antes y después de un trasplante intestinal.
+
+## 3.1. Origen y selección de los datos
+
+El conjunto de datos utilizado en este estudio se obtuvo del repositorio público https://github.com/nutrimetabolomics/metaboData/, que proporciona acceso a diversos conjuntos de datos de metabolómica. En particular, el dataset utilizado está relacionado con los intestinos humanos (https://github.com/nutrimetabolomics/metaboData/tree/main/Datasets/2023-UGrX-4MetaboAnalystTutorial), más concretamente con individuos que se han sometido a un trasplante intestinal, y de los que se han recogido muestras intestinales, antes y después del trasplante, para tomar medidas de expresión de diferentes metabolitos asociados.
+
+Cargaremos el dataset con los datos de metabolitos, sus metadatos y la información general del dataset desde archivos de texto.
+
+```{r}
+#Leer datos
+intestinal_data <- read.table("ST000002_AN000002_clean.csv", header=TRUE, sep="\t", row.names = 1)
+info <-readLines("ST000002_AN000002_dataset_info.md")
+metabolite_metadata <- read.table("ST000002_AN000002_metadata.txt", header=TRUE, sep="\t", row.names = 1)
+```
+
+El dataset contiene valores de expresión de diferentes metabolitos en muestras intestinales de individuos antes y después de un trasplante intestinal. Cada fila representa un metabolito, mientras que las columnas corresponden a muestras individuales. También se incluye una fila que describe el grupo de cada muestra (antes, *Before*, o después, *After*, del trasplante) y las muestras están etiquetadas inicialmente con las letras A y B, según al grupo al que pertenezcan. Los datos de las muestras están almacenados en formato .csv (archivo "ST000002_AN000002_clean.csv")
+
+La información general del dataset la obtenemos de un documento markdown (archivo "ST000002_AN000002_dataset_info.md") y nos proporciona una breve documentación explicando el origen de los datos, su organización, la autoría, etc.
+
+Por último, los metadatos de los metabolitos analizados la obtenemos de otro documento de texto (archivo "ST000002_AN000002_metadata.txt") donde cada fila representa un metabolito diferente y las columnas son diferentes carácterísticas propias de estos metabolitos.
+
+## 3.2. Herramientas y paquetes utilizados
+
+El análisis se ha llevado a cabo utilizando el lenguaje de programación R, y se ha apoyado en herramientas de Bioconductor para facilitar el procesamiento y análisis de los datos ómicos. A continuación se enumeran los paquetes específicos empleados:
+
+  - **SummarizedExperiment**: Este paquete permite estructurar los datos y metadatos en un contenedor unificado, optimizado para análisis ómicos. Facilita el manejo de los datos de expresión y permite conservar las relaciones entre las variables y muestras.
+  
+```{r}
+if (!requireNamespace("BiocManager", quietly = TRUE))
+    install.packages("BiocManager")
+BiocManager::install("SummarizedExperiment")
+```
+
+  - **hist, plot, density, boxplot**: Estas funciones de R se emplean para generar gráficos descriptivos de los datos, como histogramas, gráficos de densidad y diagramas de cajas (boxplots). Estos gráficos permiten observar la distribución de los datos y detectar patrones o valores atípicos en las muestras de forma visual.
+  
+  - **prcom**: Esta función de R se utiliza para realizar el análisis de componentes principales (PCA), una técnica de reducción de dimensionalidad que facilita la identificación de patrones y agrupaciones entre las muestras al transformar las variables originales en nuevas componentes principales.
+  
+  - **pairs**: Esta función de R se emplea para visualizar las relaciones entre las primeras componentes principales generadas por el PCA, permitiendo explorar posibles agrupaciones o correlaciones entre las muestras a través de gráficos de pares de componentes.
+  
+  - **hclust y dist**: Estas funciones de R se utilizan para el análisis de agrupación jerárquica (clustering). `dist` calcula la matriz de distancias entre muestras, y `hclust` construye el dendrograma, mostrando relaciones de similitud y posibles agrupaciones entre las muestras basadas en las medidas de expresión de metabolitos.
+
+## 3.3. Procedimiento general de análisis
+
+El análisis general se desarrollará en varias etapas. Una vez cargados los datos y los metadatos del dataset relacionado con el intestino humano pre/post trasplante, se deben organizar en un objeto `SummarizedExperiment`, una estructura específica de Bioconductor y una extensión de `ExpressionSet`, que permite almacenar de manera conjunta las mediciones ómicas y sus metadatos. Esto facilitará el acceso y la manipulación de los datos durante el análisis.
+
+Posteriormente, se realizará un análisis exploratorio inicial utilizando estadísticas univariantes para examinar la variabilidad y distribución de los datos.
+
+A continuación, se aplicará un análisis de componentes principales (PCA) para reducir la dimensionalidad y facilitar la identificación de patrones y posibles agrupaciones entre las muestras.
+
+Finalmente, se empleará una agrupación jerárquica para confirmar y visualizar cualquier posible agrupación natural en los datos, ofreciendo una perspectiva adicional sobre la relación entre las muestras en función de su perfil metabolómico.
+
+# 4. Resultados
+
+En esta sección vamos a presentar los resultados obtenidos del análisis exploratorio del dataset de metabolómica seleccionado (muestras intestinales pre/post transplante), enfocado en la identificación de patrones y características clave de los datos de expresión de metabolitos. Estudiaremos, en primer lugar, la estructura de los datos del dataset y, a continuación, realizaremos el análisis exploratorio de los datos, mediante el cuál, a través de una serie de técnicas estadísticas y visualizaciones, se busca una comprensión general de la variabilidad, distribución y relaciones entre las muestras y los metabolitos en el dataset.
+
+## 4.1. Estructura de los datos
+
+En primer lugar, se ha creado un objeto `SummarizedExperiment`, que facilita la integración de los datos de expresión y los metadatos. Este objeto es un contenedor de tipo matriz donde las filas representan características de interés (por ejemplo, genes, transcripciones, exones, etc.) y las columnas representan muestras. También contiene la matriz de expresión de los datos, los metadatos de las filas y las columnas, y la información general del estudio.
+
+Cargamos primero el paquete necesario y después, convertimos los datos de estudio en una matriz numérica y creamos un `data.frame` para los metadatos de las muestras. Con esta información, creamos un objeto `SummarizedExperiment` que contiene los datos de los metabolitos, los metadatos de las muestras y los metabolitos, y la información del experimento en general, facilitando su análisis y manipulación en un solo objeto estructurado. Veamos el resultado del objeto `SummarizedExperiment` creado:
+
+```{r}
+#Cargar paquete `SummarizedExperiment`
+library(SummarizedExperiment)
+
+#Convertir los datos de metabolitos a una matriz numérica, convirtiendo los datos a tipo numérico
+metabolite_data <- as.matrix(as.data.frame(lapply(intestinal_data[-1,], as.numeric)))
+
+#Obtener los metadatos de las muestras (grupo al que pertenecen) a partir del dataset
+sample_metadata <- data.frame(
+  Groups = t(intestinal_data[1,]), #Transponer la primera fila para obtener el vector de grupos
+  row.names = colnames(intestinal_data)
+)
+
+#Crear el objeto `SummarizedExperiment`
+se <- SummarizedExperiment(
+  assays = list(counts = metabolite_data), #Matriz de datos
+  rowData = metabolite_metadata, #Metadatos de los metabolitos
+  colData = sample_metadata #Metadatos de las muestras
+)
+
+#Agregar la información adicional sobre el dataset en 'metadata' del objeto `SummarizedExperiment`
+metadata(se)$dataset_info <- paste(info, collapse = "\n")
+
+#Mostrar el objeto `SummarizedExperiment` resultante
+se
+
+```
+
+```{r}
+#Guardar en un archivo .Rda
+save(se, file = "Contenedor_SummarizedExperiment.Rda")
+```
+
+
+Podemos ver un resumen de las dimensiones, filas, columnas y metadatos del objeto `SummarizedExperiment` creado. Este objeto contiene datos de 142 metabolitos en 12 muestras, junto con metadatos específicos sobre cada metabolito y muestra.
+
+Comprobemos los datos de la clase.
+
+```{r}
+#Clase del objeto `SummarizedExperiment`
+class(se)
+```
+
+Veamos las dimensiones del objeto, es decir, el número de filas (metabolitos) y columnas (muestras) en el conjunto de datos.
+
+```{r}
+#Dimensiones del objeto `SummarizedExperiment`
+dim(se)
+```
+
+Examinemos la matriz que contiene los valores de los metabolitos para cada muestra. Dado que la cantidad de datos es muy elevada, vamos a mostrar sólo una cabecera (`head`).
+
+```{r}
+#Matriz de datos del objeto `SummarizedExperiment`
+head(assays(se)$counts)
+```
+
+Vamos a comprobar ahora los metadatos de los metabolitos (filas) del dataset. Se mostrará la información sobre cada metabolito, como sus nombres, categorías y demás características propias.
+
+```{r}
+#Metadatos de las filas del objeto `SummarizedExperiment`
+rowData(se)
+```
+
+A continuación, también comprobaremos los metadatos pero esta vez de las muestras (columnas) del dataset. Se mostrarán los nombres y la información sobre los grupos o categorías de cada muestra.
+
+```{r}
+#Metadatos de las columnas del objeto `SummarizedExperiment`
+colData(se)
+```
+
+En este caso, podemos ver que las muestras se dividen en dos grupos, *After* y *Before*, que indican si las muestras se obtivieron antes (*Before*) o después (*After*) de un transplante intestinal. También podemos ver como los nombres de las muestras también contienen esta información, pues aquellas que pertenecen al grupo *After* comienzan con la letra A y aquellas que pertenecen al grupo *Before* comienzan con la letra B.
+
+Con la función `metadata()` podemos ver los metadatos generales del dataset, es decir, la información general del conjunto de datos, que se cargó previamente, sin embargo, como comprobamos a continuación, al provenir esta información de un documento de texto (.md, en este caso) su lectura es complicada. 
+
+```{r}
+#Metadatos del dataset del objeto `SummarizedExperiment`
+metadata(se)
+```
+
+Por ello, vamos a generar los metadatos del dataset en formato tabla para poder leer más adecuadamente la información.
+
+```{r}
+#Obtener el texto completo de `dataset_info`
+info_text <- metadata(se)$dataset_info
+
+#Dividir el texto en líneas
+info_lines <- strsplit(info_text, "\n")[[1]]
+
+# Filtrar líneas que contienen pares clave-valor
+info_kv_lines <- grep(":", info_lines, value = TRUE)
+
+#Separar cada línea en clave y valor usando `strsplit`
+info_split <- strsplit(info_kv_lines, "\t|: ")
+
+#Crear un `data.frame` con claves y valores
+info_table <- data.frame(
+  Clave = sapply(info_split, `[`, 1),
+  Valor = sapply(info_split, function(x) paste(x[-1], collapse = " ")),
+  stringsAsFactors = FALSE
+)
+
+#Ver la tabla generada
+knitr::kable(info_table, format = "pipe")
+
+```
+
+## 4.1. Análisis exploratorio de los datos
+
+Una vez integrados los datos en un objeto `SummarizedExperiment` y analizado la estructura y obtenida la información de los mismos, vamos a proceder a realizar una exploración general que nos proporcione más información sobre el estado de las muestras. Calcularemos los estadísticos descriptivos habituales, empezando por medidas univariantes y progresando a estadísticos multivariantes.
+
+### 4.1.1. Análisis exploratorio univariante
+
+Comenzaremos con un **análisis estadístico básico** que incluye medidas como la media, el mínimo, el máximo y la desviación estándar de la expresión de cada muestra, para caracterizar la variabilidad de los datos.
+
+```{r}
+#Obtención de las estadísticas básicas de cada muestra (redondeado)
+round(apply(assays(se)$counts,2, summary))
+```
+
+A continuación, vamos a obtener un **histograma** de expresión por cada muestra, que permite observar la frecuencia de niveles de expresión de los metabolitos dentro de cada muestra y detectar tendencias o anomalías específicas.
+
+```{r}
+#Histogramas de expresión de cada muestra
+par(mfrow=c(3,3)) #Mostrar 3x3 histogramas por ventana
+for (i in 1:ncol(assays(se)$counts))
+  hist(assays(se)$counts[,i], main = colnames(assays(se)$counts)[i], col = "lightgreen")
+```
+
+Con estos histogramas podemos hacernos una idea inicial de que todas las muestras tienen valores metabolíticos muy similares, sin mostrar grandes diferencias. Vamos a realizar más gráficos para poder obtener más información al respecto.
+
+Mostramos ahora un **gráfico de densidad** de todas las muestras. Mediante gráfico se observa una visualización de la distribución general de la expresión de los metabolitos en todas las muestras, permitiendo observar cómo se distribuyen los niveles de expresión y detectar posibles diferencias entre muestras. Cada muestra tiene un color diferente, y una leyenda ayuda a identificar cada línea.
+
+```{r}
+#Gráfico de densidad de todas las muestras
+par(mfrow = c(1, 1))  #Restablece la ventana de gráficos a una sola gráfica
+plot(density(assays(se)$counts[, 1]), main = "Gráfico de densidad de expresión de los metabolitos en las muestras",
+     xlab = "Expresión de metabolitos", ylab = "Densidad")
+for (i in 2:ncol(assays(se)$counts)) {
+  lines(density(assays(se)$counts[, i]), col = i)
+}
+#Leyenda para el gráfico de densidad
+legend("topright", legend = colnames(assays(se)$counts), col = 1:ncol(assays(se)$counts), lwd = 2, cex = 0.7)
+
+```
+
+Al igual que con los gráficos anteriores, con el gráfico de densidad observamos que las curvas de densidad son, también, similares en todas las muestras, con algunos picos diferentes pero, en general, sin mostrar grandes diferencias.
+
+Con los **diagramas de cajas (*Boxplot*)** quizá podramos observar de manera más clara las posibles diferencias entre las muestras, puesto que estos diagramas proporcionan una comparación gráfica de la distribución de los niveles de expresión de los metabolitos a través de todas las muestras, identificando posibles valores atípicos y diferencias en la variabilidad, y nos pueden proporcionar alguna pista sobre la conveniencia de realizar algún tipo de procesamiento de los datos.
+
+```{r}
+#Diagramas de cajas (Boxplot) para todas las muestras
+par(mfrow = c(1, 1))  # Restablece la ventana de gráficos a una sola gráfica
+colors <- c(rep("orange", 6), rep("skyblue", 6)) #Colores para diferenciar entre grupos de muestras
+boxplot(assays(se)$counts, col=colors, main="Valores de expresión de metablotios en las muestras (2 grupos)", ylab="Expresión", las=2, cex.axis=0.8)
+```
+
+Podemos comprobar mediantes los diagramas de cajas que los datos presentan asimetría. Vamos a comprobar si esta asimetría podría corregirse escalando los datos mediante **logaritmos**.
+
+```{r}
+#Diagramas de cajas (Boxplot) para todas las muestras con escala logarítmica
+par(mfrow = c(1, 1))  # Restablece la ventana de gráficos a una sola gráfica
+colors <- c(rep("coral", 6), rep("blue", 6)) #Colores para diferenciar entre grupos de muestras
+boxplot(log(assays(se)$counts), col=colors, main="Valores de log de expresión de metablotios en las muestras (2 grupos)", ylab="Expresión", las=2, cex.axis=0.8)
+```
+
+En vista de los resultados obtenidos con los diagramas de cajas, mediante los datos escalados logarítmicamente, parece **más razonable trabajar con estos datos transformados**.
+
+### 4.1.2. Análisis exploratorio multivariante
+
+En esta sección nos vamos a centrar en analizar **las componentes principales (PCA)** del estudio. Así realizaremos un análisis de reducción de dimensionalidad para identificar patrones y posibles agrupaciones entre las muestras, facilitando su visualización, lo que ayudará a detectar relaciones complejas y correlaciones entre metabolitos.
+
+El análisis de componentes principales (PCA) transforma las variables originales en nuevas componentes. Estas nuevas componentes son independientes entre sí (ortogonales), puesto que cada una explica diferentes aspectos de los datos, y además, explican la variabilidad observada, con capacidad decreciente (la primera componente explica la mayor variablidad y la última, la menor).
+
+Calculemos, en primer lugar, las **componentes principales (PC)**.
+
+```{r}
+#Cálculo de las componentes principales (PC)
+pc <- prcomp(t(assays(se)$counts), scale. = TRUE)
+summary(pc)
+```
+
+Podemos comprobar que no se explica más de un 70% de la variabilidad de los datos hasta la componente 5, por lo que precisaríamos de las PC desde la 1 a la 5. También vemos que 11 componentes explican el 100% de la variabilidad de los datos, lo que significa que la última componente (PC12) no aporta variabilidad adicional porque tiene una desviación estándar cercana a cero.
+
+Vamos a visualizar, en primer lugar, los resultados de las **dos primeras componentes principales (PC1 y PC2)** mediante la generación de un gráfico. 
+
+```{r}
+#Generar el gráfico de las dos primeras componentes principales
+plot(pc$x[, 1], pc$x[, 2],
+     #Para generar los nombres de los ejes, obtenemos las proporciones de varianza de las dos PCs
+     xlab = paste("PC1 (", round(summary(pc)$importance[2, 1] * 100, 2), "%)", sep = ""),
+     ylab = paste("PC2 (", round(summary(pc)$importance[2, 2] * 100, 2), "%)", sep = ""),
+     col = colors, lwd = 2,
+     main = "Gráfico de las dos primeras componentes principales")
+
+#Obtenemos los nombres de las columnas del dataset para añadirlos al gráfico de PCs
+sample_names <- paste0(colnames(assays(se)$counts), 1:6)
+text(pc$x[,1],pc$x[,2],sample_names, pos=3, cex=0.6)
+```
+
+A continuación, visualizaremos los resultados de las **cinco primeras componentes principales (PC1 a PC5)** mediante la generación de un gráfico, puesto que hemos concluido que precisaríamos de las cinco primeras componentes principales para garantizar la identificación de patrones.
+
+```{r}
+#Generar el gráfico de las cinco primeras componentes principales
+pca_scores <- as.data.frame(pc$x[, 1:5]) #Puntuaciones de las primeras cinco componentes
+
+#Se genera el gráfico por pares
+pairs(pca_scores, 
+      main = "Gráfico de pares de las primeras cinco componentes crincipales",
+      labels = paste("PC", 1:5,"(",round(summary(pc)$importance[2, 1:5] * 100, 2), "%)", sep=""),
+      col=colors, lwd = 2)
+```
+
+En ambos gráficos podemos observar como **no se distingue, en general, una agrupación** clara asociada con el grupo (*After* o *Before*), existiendo algunas excepciones, como entre PC1 y PC3, donde se ve una ligera separación entre los grupos. Tampoco se observa una clara separación entre las muestras a partir de los metabolitos ni agrupaciones, lo que nos indica que no hay similitudes en los perfiles de metabolitos y no se detectan grupos biológicos.
+
+Todo esto nos indica que las cargas que cada metabolito tiene asociadas en cada componente principal son bajas y que ningún metabolito contrubuye de manera significativa a cada componente. Esto último lo podemos deducir del bajo porcentaje de varianza que tenía cada componente.
+
+Por último, vamos a utilizar una **agrupación jerárquica (*cluster*)** para visualizar, mediante un dendograma, cualquier posible agrupación de las muestras que no se haya podido detectar con el análisis de componentes principales.
+
+```{r}
+#Dendograma de la agrupación jerárquica (cluster) de las muestras
+#Cálculo de las distancias y composición del cluster
+clust_dist <- hclust(dist(t(assays(se)$counts)), method = "complete")
+plot(clust_dist, hang=-1)
+```
+
+Parece ser que, con la agrupación jerárquica, hemos descubierto dos grupos diferenciados entre las muestras. Esto nos indica que sí debe de haber algún metabolito que contrubuya de manera más significativa a algún componente principal, y que las dos primeras muestras del dendograma se asociarían más a ciertos metabolitos que el resto de las muestras.
+
+# 5. Discusión, limitaciones y conclusiones del estudio
+
+A través del análisis de componentes principales (PCA) y la agrupación jerárquica, se observó que, aunque las muestras no se agrupan de forma clara en función del estado pre o post trasplante, algunos patrones sugieren que ciertos metabolitos podrían estar asociados a las diferencias metabólicas después del trasplante. La agrupación jerárquica, en particular, indica que puede haber una diferenciación sutil entre las muestras.
+
+Entre las limitaciones del estudio, cabe destacar la limitada cantidad de muestras y la posible necesidad de aplicar técnicas de normalización adicionales para mejorar la calidad de los datos y eliminar un posible efecto batch antes del análisis. Además, los resultados no permiten identificar metabolitos específicos como indicadores claros de los cambios post trasplante, lo cual podría deberse a la variabilidad biológica inherente o a factores de confusión no considerados en este análisis. A pesar de estas limitaciones, los datos utilizados no presentaban problemas, pues no había valores faltantes (NA) y las muestras estaban bien distribuidas.
+
+En conclusión, aunque no se encontraron patrones de agrupación claros, los hallazgos preliminares sugieren que un análisis más detallado, posiblemente con un tamaño de muestra mayor y técnicas de procesamiento de datos adicionales, podría identificar metabolitos clave en la monitorización post trasplante.
+
+# Apéndice 1: Repositorio GitHub
+
+El informe final, el documento Rmarkdown original, el objeto contenedor con los datos y los metadatos en formato binario (.Rda), el documento con el código R para la exploración de los datos y los datos y metadatos acerca del dataset se pueden encontrar en el siguiente repositorio de GitHub:
+https://github.com/BeatrizJimenezGuijarro/Jimenez-Guijarro-Beatriz-PEC1
+
+# Apéndice 2: código R
+
+Todo el código R de este informe se puede encontrar tanto en el informe original en formato Rmarkdown ("Jimenez_Guijarro_Beatriz_PEC1.Rmd") como en el documento .R ("Jimenez_Guijarro_Beatriz_PEC1.Rmd") que engloba únicamente las celdas de código utilizado a lo largo del informe y que se ha generado mediante la instrucción `knitr::purl("Jimenez_Guijarro_Beatriz_PEC1.Rmd", output = "Jimenez_Guijarro_Beatriz_PEC1.R")`. Este documento .R se ha incluido en este apéndice dentro de una última celda de código que no se ejecuta y que no se muestra en el informe final, pero sí en el documento Rmarkdown.
+
+```{r code, file="Jimenez_Guijarro_Beatriz_PEC1.R", eval=FALSE}
+
+```
+
+# Referencias
+
